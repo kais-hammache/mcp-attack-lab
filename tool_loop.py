@@ -15,10 +15,8 @@ def read_path(path):
 
 client = anthropic.Anthropic()
 
-response = client.messages.create(
-    model="claude-haiku-4-5-20251001", 
-    max_tokens=200, 
-    tools=[{ 
+user_message= "What does the file notes.txt contain?"
+tools=[{ 
         "name": "read_file",
         "description": "This tool read a file.", 
         "input_schema": {
@@ -30,8 +28,13 @@ response = client.messages.create(
                 "required": ["path"],
             },
         }
-    ],
-    messages=[ {"role": "user", "content": "What does the file secret.txt contain?"} ]
+    ]
+
+response = client.messages.create(
+    model="claude-haiku-4-5-20251001", 
+    max_tokens=200, 
+    tools=tools,
+    messages=[ {"role": "user", "content": user_message} ]
 )
 
 print(response)
@@ -39,5 +42,27 @@ print(response)
 
 for block in response.content:
     if block.type == "tool_use":
+        tool_id = block.id
         result = read_path(block.input["path"])
-        print(result)
+
+final = client.messages.create(
+    model="claude-haiku-4-5-20251001",
+    max_tokens=200,
+    tools= tools,                       
+    messages=[
+        {"role": "user", "content": user_message},        
+        {"role": "assistant", "content": response.content},   
+        {
+            "role": "user",                       
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_id,
+                    "content": result,
+                }
+            ],
+        },
+    ],
+)
+
+print(final)
