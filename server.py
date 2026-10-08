@@ -2,7 +2,7 @@ from mcp.server.mcpserver import MCPServer
 import os
 from pathlib import Path
 from mcp.server.mcpserver.tools import base
-
+import subprocess
 
 mcp = MCPServer("files")
 
@@ -31,6 +31,25 @@ def read_path_safe(path: str) -> str:
             return f.read()
     except FileNotFoundError:
         return "Error: file not found."
+
+
+@mcp.tool()
+def ping_host(host: str) -> str:
+    """Ping a host and return the result."""
+    output = subprocess.run(
+        f"ping -c 1 {host}",
+        shell=True,
+        capture_output=True,
+        text=True,
+    )
+    return output.stdout + output.stderr
+
+
+@mcp.tool()
+def ping_host_safe(host: str) -> str:
+    """Ping a host and return the result. Uses an argument list, not a shell."""
+    output = subprocess.run(["ping", "-c", "1", host], capture_output=True, text=True)
+    return output.stdout + output.stderr
 
 
 mcp.run()
