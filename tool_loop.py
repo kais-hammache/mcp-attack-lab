@@ -2,39 +2,38 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-import anthropic 
+import anthropic
 
 
-FAKE_FILES={"notes.txt": "Buy milk. Call Alice."}
+FAKE_FILES = {"notes.txt": "Buy milk. Call Alice."}
+
 
 def read_path(path):
     if path not in FAKE_FILES:
         return "Error: file not found"
     return FAKE_FILES[path]
-        
+
 
 client = anthropic.Anthropic()
 
-user_message= "What does the file notes.txt contain?"
-tools=[{ 
+user_message = "What does the file notes.txt contain?"
+tools = [
+    {
         "name": "read_file",
-        "description": "This tool read a file.", 
+        "description": "This tool read a file.",
         "input_schema": {
-
-                "type": "object",
-                "properties": {
-                    "path": {"type": "string"}
-                },
-                "required": ["path"],
-            },
-        }
-    ]
+            "type": "object",
+            "properties": {"path": {"type": "string"}},
+            "required": ["path"],
+        },
+    }
+]
 
 response = client.messages.create(
-    model="claude-haiku-4-5-20251001", 
-    max_tokens=200, 
+    model="claude-haiku-4-5-20251001",
+    max_tokens=200,
     tools=tools,
-    messages=[ {"role": "user", "content": user_message} ]
+    messages=[{"role": "user", "content": user_message}],
 )
 
 print(response)
@@ -48,12 +47,12 @@ for block in response.content:
 final = client.messages.create(
     model="claude-haiku-4-5-20251001",
     max_tokens=200,
-    tools= tools,                       
+    tools=tools,
     messages=[
-        {"role": "user", "content": user_message},        
-        {"role": "assistant", "content": response.content},   
+        {"role": "user", "content": user_message},
+        {"role": "assistant", "content": response.content},
         {
-            "role": "user",                       
+            "role": "user",
             "content": [
                 {
                     "type": "tool_result",

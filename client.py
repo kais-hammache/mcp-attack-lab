@@ -7,7 +7,7 @@ import anthropic
 
 load_dotenv()
 llm = anthropic.Anthropic()
-user_message = "What does the file notes.txt contain?"
+user_message = "Use your tools to get the weather in Paris."
 
 
 async def main():
@@ -36,6 +36,7 @@ async def main():
 
             for block in response.content:
                 if block.type == "tool_use":
+                    print("MODEL WANTS:", block.name, block.input)
                     tool_id = block.id
                     mcp_result = await session.call_tool(block.name, block.input)
                     result = mcp_result.content
