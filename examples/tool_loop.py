@@ -1,3 +1,4 @@
+# Learning script, step N. Not part of the scanner.
 from dotenv import load_dotenv
 
 load_dotenv()

@@ -1,3 +1,4 @@
+# Learning script, step N. Not part of the scanner.
 import asyncio
 from mcp import ClientSession, StdioServerParameters, server
 from mcp.client.stdio import stdio_client

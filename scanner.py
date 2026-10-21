@@ -12,7 +12,9 @@ CANARY = "CANARY-7f3a9"
 PATH_CHARGES = ["../secret.txt", os.path.abspath("secret.txt"), "notes.txt"]
 PATH_TOOLS = ["read_path", "read_path_safe"]
 
-
+RED = "\033[91m"
+GREEN = "\033[92m"
+RESET = "\033[0m"
 CMD_CHARGES = ["localhost", "; cat secret.txt"]
 CMD_TOOLS = ["ping_host", "ping_host_safe"]
 
@@ -231,7 +233,8 @@ def print_report(results):
     print("mcp-scan report")
     print("=" * 50)
     for r in results:
-        print(f"[{r['verdict']}] {r['attack']}")
+        color = RED if r["verdict"] == "VULNERABLE" else GREEN
+        print(f"[{color}{r['verdict']}{RESET}] {r['attack']}")
         print(f"    {r['detail']}")
     print("=" * 50)
 
