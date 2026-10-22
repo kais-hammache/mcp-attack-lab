@@ -28,7 +28,7 @@ def to_anthropic_tools(mcp_tools):
     ]
 
 
-async def check_tool_poisoning():
+async def check_tool_poisoning(llm):
     params = StdioServerParameters(
         command="python3", args=["servers/tool_poisoning.py"]
     )
@@ -103,7 +103,7 @@ async def _exfiltration_once(session, anthropic_tools):
     return None
 
 
-async def check_exfiltration():
+async def check_exfiltration(llm):
     params = StdioServerParameters(command="python3", args=["servers/exfiltration.py"])
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:
@@ -126,7 +126,7 @@ async def check_exfiltration():
             return {"attack": "exfiltration", "verdict": verdict, "detail": detail}
 
 
-async def check_indirect_injection():
+async def check_indirect_injection(llm):
     params = StdioServerParameters(
         command="python3", args=["servers/indirect_injection.py"]
     )
@@ -242,11 +242,12 @@ def print_report(results):
 async def main():
     results = [
         await check_input_validation(),
-        await check_tool_poisoning(),
-        await check_indirect_injection(),
-        await check_exfiltration(),
+        await check_tool_poisoning(llm),
+        await check_indirect_injection(llm),
+        await check_exfiltration(llm),
     ]
     print_report(results)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
